@@ -18,6 +18,7 @@ public class BluetoothService {
 
     private BluetoothAdapter bluetoothAdapter;
     Set<BluetoothDevice> pairedDevices;
+    private BluetoothDevice selectedDevice;
 
     Handler handler;
 
@@ -40,12 +41,20 @@ public class BluetoothService {
         }
     }
 
+    public String getSelectedDevice() {
+        return "Device:" + selectedDevice.getName() + " " + selectedDevice.getAddress();
+    }
+
     public ArrayList<String> getListOfDevices() {
         ArrayList<String> devices = new ArrayList<>();
         for (BluetoothDevice b: bluetoothAdapter.getBondedDevices()) {
             devices.add(b.getName());
         }
         return devices;
+    }
+
+    public void selectDevice(int index) {
+        selectedDevice = (BluetoothDevice) bluetoothAdapter.getBondedDevices().toArray()[index];
     }
 
     public void setHandler(Handler handler){

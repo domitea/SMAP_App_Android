@@ -1,5 +1,6 @@
 package uhk.fim.smap.matoulek.smap_app_android;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,7 +25,8 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                       @Override
                                       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                          Log.d("SMAP_APP", BluetoothService.getInstance().getListOfDevices().get(i));
+                                          BluetoothService.getInstance().selectDevice(i);
+                                          startActivity(new Intent(getApplicationContext(), ControlActivity.class));
                                       }
                                   }
         );
