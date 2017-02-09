@@ -121,6 +121,7 @@ public class BluetoothService {
                     }
                 } catch (IOException e)
                 {
+                    cancel();
                     e.printStackTrace();
                 }
             }
@@ -130,6 +131,15 @@ public class BluetoothService {
             try {
                 outputStream.write(buffer);
             } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void cancel() {
+            try {
+                socket.close();
+            } catch (IOException e)
+            {
                 e.printStackTrace();
             }
         }
