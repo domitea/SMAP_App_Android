@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 public class ControlActivity extends AppCompatActivity {
 
+    BluetoothService BTService = BluetoothService.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -14,6 +16,8 @@ public class ControlActivity extends AppCompatActivity {
 
         TextView text = (TextView) findViewById(R.id.textView);
 
-        text.setText(BluetoothService.getInstance().getSelectedDevice());
+        text.setText(BTService.getSelectedDevice());
+
+
     }
 }

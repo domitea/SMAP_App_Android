@@ -110,7 +110,7 @@ public class BluetoothService {
                         for(int i = 0; i < buffer_data.size(); i++) {
                             buffer[i] = buffer_data.get(i).byteValue();
                         }
-                        Log.d("SMAP_APP", "run: sended " + buffer_data.toString());
+                        Log.d("SMAP_APP", "run: recieved " + buffer_data.toString());
                         handler.obtainMessage(1,buffer.length, -1, buffer).sendToTarget();
                         buffer_data = new ArrayList<>();
                     }
@@ -129,6 +129,7 @@ public class BluetoothService {
 
         public void write(byte[] buffer) {
             try {
+                Log.d("SMAP_APP", "write: sended " + buffer);
                 outputStream.write(buffer);
             } catch (IOException e) {
                 e.printStackTrace();
