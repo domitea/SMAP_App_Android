@@ -24,6 +24,7 @@ public class BluetoothService {
     private BluetoothAdapter bluetoothAdapter;
     Set<BluetoothDevice> pairedDevices;
     private BluetoothDevice selectedDevice;
+    private CommunicationThread communicationThread;
 
     private final UUID UUID_Serial = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -64,7 +65,9 @@ public class BluetoothService {
         selectedDevice = (BluetoothDevice) bluetoothAdapter.getBondedDevices().toArray()[index];
     }
 
-
+    public void createSocket(Handler handler) {
+        
+    }
 
     public void setHandler(Handler handler){
         this.handler = handler;

@@ -18,6 +18,5 @@ public class ControlActivity extends AppCompatActivity {
 
         text.setText(BTService.getSelectedDevice());
 
-
     }
 }
