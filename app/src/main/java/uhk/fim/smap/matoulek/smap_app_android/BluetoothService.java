@@ -70,6 +70,7 @@ public class BluetoothService {
             socket = selectedDevice.createRfcommSocketToServiceRecord(UUID_Serial);
             socket.connect();
             communicationThread = new CommunicationThread(socket, handler);
+            communicationThread.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,10 +107,12 @@ public class BluetoothService {
 
         }
 
+        @Override
         public void run() {
             byte[] buffer;
             ArrayList<Integer> buffer_data = new ArrayList<>();
 
+            bluetoothAdapter.cancelDiscovery();
             while (true)
             {
                 try {
