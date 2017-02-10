@@ -28,8 +28,6 @@ public class BluetoothService {
 
     private final UUID UUID_Serial = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    Handler handler;
-
     public static BluetoothService getInstance() {
         return ourInstance;
     }
@@ -66,11 +64,20 @@ public class BluetoothService {
     }
 
     public void createSocket(Handler handler) {
-        
+        BluetoothSocket socket = null;
+
+        try {
+            socket = selectedDevice.createRfcommSocketToServiceRecord(UUID_Serial);
+            socket.connect();
+            communicationThread = new CommunicationThread(socket, handler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    public void setHandler(Handler handler){
-        this.handler = handler;
+    public void send(byte[] data) {
+        communicationThread.write(data);
     }
 
     private class CommunicationThread extends Thread {
