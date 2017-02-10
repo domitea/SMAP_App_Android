@@ -35,6 +35,6 @@ public class ControlActivity extends AppCompatActivity {
     };
 
     public void click(View view) {
-        BTService.send(new byte[] {(byte) 'X', (byte) 'A', (byte) '!'});
+        BTService.send(new byte[] {(byte) 'X', (byte) 'B', (byte) '!'});
     }
 }
