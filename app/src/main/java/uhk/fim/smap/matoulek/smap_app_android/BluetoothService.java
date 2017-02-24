@@ -63,7 +63,7 @@ public class BluetoothService {
         selectedDevice = (BluetoothDevice) bluetoothAdapter.getBondedDevices().toArray()[index];
     }
 
-    public void createSocket(Handler handler) {
+    public boolean createSocket(Handler handler) {
         BluetoothSocket socket = null;
 
         try {
@@ -71,10 +71,17 @@ public class BluetoothService {
             socket.connect();
             communicationThread = new CommunicationThread(socket, handler);
             communicationThread.start();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
 
+    }
+
+    public void stop() {
+        communicationThread.cancel();
+        communicationThread = null;
     }
 
     public void send(byte[] data) {
