@@ -6,24 +6,66 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 
 public class ControlActivity extends AppCompatActivity {
 
     BluetoothService BTService = BluetoothService.getInstance();
     TextView text;
+    TextView textSeek;
+    SeekBar seekBar;
+    Switch negationSwitch;
+
+    int aimedSteps;
+    boolean countPlus;
+    int realSteps;
+    int settedValueFromProgress;
+    int minus = 1;
+    boolean absolute_checked = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control);
 
-         text = (TextView) findViewById(R.id.textView);
+        text = (TextView) findViewById(R.id.textView);
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        textSeek = (TextView) findViewById(R.id.textViewSeek);
 
         text.setText(BTService.getSelectedDevice());
 
         if(!BTService.createSocket(handler)) {
             finish();
         }
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                settedValueFromProgress = minus * i;
+                textSeek.setText("Nastaveno: " + settedValueFromProgress + " stupnu");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        //BTService.send(new byte[] { (byte) 'D', (byte) 'R', (byte) '!'});
 
     }
 
@@ -32,23 +74,174 @@ public class ControlActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    text.setText(msg.obj.toString());
-                    byte[] message = msg.getData().getByteArray(null);
+                    //text.setText(msg.obj.toString());
+                    byte[] message = (byte[]) msg.obj;
                     parseMessage(message);
             }
         }
     };
 
     private void parseMessage(byte[] message) {
-        
+        if (message.length > 0) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < message.length; i++) {
+                if ((message[i] != (byte) 13) || (message[i] != (byte) 10)) {
+                    builder.append((char) message[i]);
+                }
+            }
+            String command = builder.toString();
+            Log.d("SMAP", "parseMessage: " + command);
+            if (command.equals("DISC")) {
+                Toast.makeText(this, "Disconnecting", Toast.LENGTH_SHORT);
+                finish();
+            }
+            if (command.equals("GP")) {
+                aimedSteps++;
+                countPlus = true;
+                Log.d("SMAP", "parseMessage: " + aimedSteps);
+                text.setText("desired> " + aimedSteps + " steps");
+            }
+            if (command.equals("GM")) {
+                aimedSteps--;
+                countPlus = false;
+                Log.d("SMAP", "parseMessage: " + aimedSteps);
+                text.setText("desired> " + aimedSteps + " steps");
+            }
+            if (command.equals("STEP")) {
+                if (countPlus) {
+                    realSteps++;
+                } else {
+                    realSteps--;
+                }
+                Log.d("SMAP", "parseMessage real: " + realSteps);
+            }
+        }
     }
 
     public void click(View view) {
-        BTService.send(new byte[] {(byte) 'm', (byte) 'r', (byte) '1', (byte) '8', (byte) '0', (byte) '!'});
+        //BTService.send(new byte[] {(byte) 'm', (byte) 'r', (byte) '1', (byte) '8', (byte) '0', (byte) '!'});
+        if (!absolute_checked) {
+                BTService.send(getCommand(CommandType.MOTOR_RELATIVE, settedValueFromProgress));
+            } else{
+                BTService.send(getCommand(CommandType.MOTOR_ABSOLUTE, settedValueFromProgress));
+            }
+
+
+    }
+
+    public void onCheckClick(View view) {
+        boolean checked = ((CheckBox) view).isChecked();
+        if (view.getId() == R.id.negative_check) {
+            if (checked) {
+                settedValueFromProgress = -settedValueFromProgress;
+                minus = -1;
+            } else {
+                settedValueFromProgress = -settedValueFromProgress;
+                minus = 1;
+            }
+
+            textSeek.setText("Nastaveno: " + settedValueFromProgress + " stupnu");
+        }
+        if (view.getId() == R.id.absolute_check) {
+            if (checked) {
+                absolute_checked = true;
+            } else {
+                absolute_checked = false;
+            }
+        }
+
+    }
+
+
+    private byte[] getCommand(int command, Object... args) {
+        aimedSteps = 0;
+        switch (command) {
+            case CommandType.MOTOR_RELATIVE: {
+                int angle = (int) args[0];
+                char[] charAngle = String.valueOf(angle).toCharArray();
+                byte[] message = new byte[charAngle.length + 3];
+                message[0] = (byte) 'm';
+                message[1] = (byte) 'r';
+                for (int i = 0; i <= charAngle.length; i++)
+                {
+                    if (i == charAngle.length) {
+                        message[i + 2] = (byte) '!';
+                    } else {
+                        message[i + 2] = (byte) charAngle[i];
+                    }
+                }
+                return message;
+            }
+            case CommandType.MOTOR_ABSOLUTE: {
+                int angle = (int) args[0];
+                char[] charAngle = String.valueOf(angle).toCharArray();
+                byte[] message = new byte[charAngle.length + 3];
+                message[0] = (byte) 'm';
+                message[1] = (byte) 'a';
+                for (int i = 0; i <= charAngle.length; i++)
+                {
+                    if (i == charAngle.length) {
+                        message[i + 2] = (byte) '!';
+                    } else {
+                        message[i + 2] = (byte) charAngle[i];
+                    }
+                }
+                return message;
+            }
+            case CommandType.HOME_SET:
+                return new byte[] {(byte) 'h', (byte) 's', (byte) '!'};
+            case CommandType.HOME_HOME:
+                return new byte[] {(byte) 'h', (byte) 'h', (byte) '!'};
+            case CommandType.HOME_REMOVE:
+                return new byte[] {(byte) 'h', (byte) 'r', (byte) '!'};
+            default: return null;
+        }
+    }
+
+    public void onSetHomeClick(View view) {
+        Button goHome = (Button) findViewById(R.id.btn_goHome);
+        goHome.setEnabled(true);
+        goHome.setClickable(true);
+
+        Button remove = (Button) findViewById(R.id.btn_remHome);
+        remove.setEnabled(true);
+        remove.setClickable(true);
+
+        BTService.send(getCommand(CommandType.HOME_SET, 0));
+    }
+
+    public void onGoHomeClick(View view) {
+        BTService.send(getCommand(CommandType.HOME_HOME, 0));
+    }
+
+    public void onRemoveHome(View view) {
+        Button goHome = (Button) findViewById(R.id.btn_goHome);
+        goHome.setEnabled(false);
+        goHome.setClickable(false);
+
+        Button remove = (Button) findViewById(R.id.btn_remHome);
+        remove.setEnabled(false);
+        remove.setClickable(false);
+
+        BTService.send(getCommand(CommandType.HOME_REMOVE, 0));
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         BTService.stop();
+        super.onDestroy();
+    }
+
+    public static class CommandType {
+        public static final int HOME_SET = 1;
+        public static final int HOME_REMOVE = 2;
+        public static final int HOME_HOME = 3;
+
+        public static final int DEBUG_LED = 4;
+        public static final int DEBUG_RESET = 5;
+        public static final int DEBUG_STEPPER = 6;
+
+        public static final int MOTOR_RELATIVE = 7;
+        public static final int MOTOR_ABSOLUTE = 8;
     }
 }

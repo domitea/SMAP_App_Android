@@ -18,14 +18,92 @@
         android:layout_alignParentStart="true"
         android:id="@+id/textView" />
 
-    <Button
-        android:text="Button"
+    <SeekBar
+        style="@android:style/Widget.Material.Light.SeekBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
+        android:progress="1"
+        android:layout_marginTop="11dp"
+        android:id="@+id/seekBar"
+        android:max="360"
+        android:layout_below="@+id/btn_send"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="31dp"
-        android:id="@+id/button"
-        android:onClick="click" />
+        android:layout_alignParentEnd="true" />
+
+    <CheckBox
+        android:text="Absolutní"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/absolute_check"
+        android:layout_above="@+id/negative_check"
+        android:layout_alignParentEnd="true"
+        android:onClick="onCheckClick" />
+
+    <CheckBox
+        android:text="Zaporne"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/negative_check"
+        android:checked="false"
+        android:onClick="onCheckClick"
+        android:layout_alignTop="@+id/btn_send"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:text="Nastavený úhel..."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:id="@+id/textViewSeek"
+        android:layout_below="@+id/seekBar"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Go Home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_goHome"
+        android:layout_alignBaseline="@+id/btn_setHome"
+        android:layout_alignBottom="@+id/btn_setHome"
+        android:layout_toEndOf="@+id/textViewSeek"
+        android:onClick="onGoHomeClick"
+        android:enabled="false"
+        tools:enabled="false"
+        tools:onClick="onGoHomeClick"
+        android:clickable="false" />
+
+    <Button
+        android:text="Set Home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_setHome"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        tools:onClick="onSetHomeClick"
+        android:onClick="onSetHomeClick" />
+
+    <Button
+        android:text="Send!"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:id="@+id/btn_send"
+        android:onClick="click"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Remove Home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:id="@+id/btn_remHome"
+        android:onClick="onRemoveHome"
+        tools:enabled="false"
+        android:enabled="false"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/btn_goHome"
+        tools:onClick="onRemoveHome"
+        android:clickable="false" />
 
 </RelativeLayout>

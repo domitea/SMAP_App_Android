@@ -80,7 +80,9 @@ public class BluetoothService {
     }
 
     public void stop() {
-        communicationThread.cancel();
+        if (communicationThread != null) {
+            communicationThread.cancel();
+        }
         communicationThread = null;
     }
 
@@ -89,9 +91,9 @@ public class BluetoothService {
     }
 
     private class CommunicationThread extends Thread {
-        private final BluetoothSocket socket;
-        private final InputStream inputStream;
-        private final OutputStream outputStream;
+        private BluetoothSocket socket;
+        private InputStream inputStream;
+        private OutputStream outputStream;
         private final Handler handler;
 
         public CommunicationThread(BluetoothSocket socket, Handler handler) {
@@ -142,7 +144,7 @@ public class BluetoothService {
                 } catch (IOException e)
                 {
                     cancel();
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         }
