@@ -1,5 +1,7 @@
 package uhk.fim.smap.matoulek.smap_app_android;
 
+import android.content.Context;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +34,8 @@ public class ControlActivity extends AppCompatActivity {
     int minus = 1;
     boolean absolute_checked = false;
 
+    SensorManager sensorManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +46,10 @@ public class ControlActivity extends AppCompatActivity {
         textSeek = (TextView) findViewById(R.id.textViewSeek);
 
         text.setText(BTService.getSelectedDevice());
+
+        sensorManager = (SensorManager) getBaseContext().getSystemService(Context.SENSOR_SERVICE);
+
+
 
         if(!BTService.createSocket(handler)) {
             finish();
