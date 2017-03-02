@@ -1,6 +1,10 @@
 package uhk.fim.smap.matoulek.smap_app_android;
 
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.Message;
@@ -34,7 +38,11 @@ public class ControlActivity extends AppCompatActivity {
     int minus = 1;
     boolean absolute_checked = false;
 
+    double lastAzimuth = 0;
+    double azimuth = 0;
+
     SensorManager sensorManager;
+    SensorEventListener sensorEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +57,9 @@ public class ControlActivity extends AppCompatActivity {
 
         sensorManager = (SensorManager) getBaseContext().getSystemService(Context.SENSOR_SERVICE);
 
+        initListener();
 
+        sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
 
         if(!BTService.createSocket(handler)) {
             finish();
@@ -75,6 +85,31 @@ public class ControlActivity extends AppCompatActivity {
 
         //BTService.send(new byte[] { (byte) 'D', (byte) 'R', (byte) '!'});
 
+    }
+
+    private void initListener() {
+        sensorEventListener = new SensorEventListener() {
+
+            float[] orientation = new float[3];
+            float[] rotationMatrix = new float[9];
+
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                Sensor sensor = sensorEvent.sensor;
+                if (sensor.getType() == Sensor.TYPE_ROTATION_VECTOR)
+                {
+                    SensorManager.getRotationMatrixFromVector(rotationMatrix, sensorEvent.values);
+                    lastAzimuth = azimuth;
+
+                    azimuth = ( Math.toDegrees(SensorManager.getOrientation(rotationMatrix, orientation)[0]) + 360 ) % 360;
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
     }
 
     private final Handler handler = new Handler() {
@@ -237,6 +272,7 @@ public class ControlActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         BTService.stop();
+        sensorManager.unregisterListener(sensorEventListener);
         super.onDestroy();
     }
 
