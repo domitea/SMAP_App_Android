@@ -106,4 +106,14 @@
         tools:onClick="onRemoveHome"
         android:clickable="false" />
 
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:id="@+id/gyroToggle"
+        android:layout_above="@+id/btn_remHome"
+        android:layout_alignStart="@+id/absolute_check"
+        android:textOff="Gyro off"
+        android:textOn="Gyro on" />
+
 </RelativeLayout>

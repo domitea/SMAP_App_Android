@@ -19,6 +19,7 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -29,7 +30,8 @@ public class ControlActivity extends AppCompatActivity {
     TextView text;
     TextView textSeek;
     SeekBar seekBar;
-    Switch negationSwitch;
+    ToggleButton gyroToggleButton;
+
 
     int aimedSteps;
     boolean countPlus;
@@ -37,6 +39,7 @@ public class ControlActivity extends AppCompatActivity {
     int settedValueFromProgress;
     int minus = 1;
     boolean absolute_checked = false;
+    boolean gyroOn = false;
 
     double lastAzimuth = 0;
     double azimuth = 0;
@@ -52,18 +55,37 @@ public class ControlActivity extends AppCompatActivity {
         text = (TextView) findViewById(R.id.textView);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         textSeek = (TextView) findViewById(R.id.textViewSeek);
+        gyroToggleButton = (ToggleButton) findViewById(R.id.gyroToggle);
 
         text.setText(BTService.getSelectedDevice());
 
         sensorManager = (SensorManager) getBaseContext().getSystemService(Context.SENSOR_SERVICE);
 
-        initListener();
-
-        sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
+        initListeners();
 
         if(!BTService.createSocket(handler)) {
             finish();
         }
+
+        sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
+
+
+        //BTService.send(new byte[] { (byte) 'D', (byte) 'R', (byte) '!'});
+
+    }
+
+    private void initListeners() {
+
+        gyroToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    gyroOn = true;
+                } else {
+                    gyroOn = false;
+                }
+            }
+        });
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -83,11 +105,6 @@ public class ControlActivity extends AppCompatActivity {
             }
         });
 
-        //BTService.send(new byte[] { (byte) 'D', (byte) 'R', (byte) '!'});
-
-    }
-
-    private void initListener() {
         sensorEventListener = new SensorEventListener() {
 
             float[] orientation = new float[3];
@@ -96,12 +113,20 @@ public class ControlActivity extends AppCompatActivity {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
                 Sensor sensor = sensorEvent.sensor;
-                if (sensor.getType() == Sensor.TYPE_ROTATION_VECTOR)
+                if (sensor.getType() == Sensor.TYPE_ROTATION_VECTOR && gyroOn)
                 {
                     SensorManager.getRotationMatrixFromVector(rotationMatrix, sensorEvent.values);
                     lastAzimuth = azimuth;
 
                     azimuth = ( Math.toDegrees(SensorManager.getOrientation(rotationMatrix, orientation)[0]) + 360 ) % 360;
+
+                    int deltaAzimuth = (int) (azimuth - lastAzimuth);
+
+                    if (Math.abs(deltaAzimuth) > 0 && Math.abs(deltaAzimuth) < 50)
+                    {
+                         BTService.send(getCommand(CommandType.MOTOR_RELATIVE, deltaAzimuth));
+                    }
+
                 }
             }
 
@@ -272,7 +297,9 @@ public class ControlActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         BTService.stop();
+        gyroOn = false;
         sensorManager.unregisterListener(sensorEventListener);
+        gyroToggleButton.setChecked(false);
         super.onDestroy();
     }
 
