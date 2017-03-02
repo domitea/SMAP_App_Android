@@ -13,27 +13,34 @@ Arduino nasdlouchá příkazům. To jsou pole bajtů, kde jeden bajt reprezentuj
 
 Příkazy lze rozdělit do tří základních skupin - Motor, Debug a Home.
 
-Motor příkazy:
+### Motor příkazy:
 
 ma{úhel}! - Absolutní natočení motoru o určitý úhel. Absolutní znamená, že se motor snaží dostat k danému natočení nejkratší možnou cestou. V praxi to například znamená, že pokud je zadán příkaz 'ma270!', tak je ve skutečnosti vykonán příkaz 'mr-90!', protože je to rychlejší.
+
 mr{úhel}! - Relativní natočení motoru o určitý úhel. Je to jednoduché a prosté natočení. Pokud mu je zadáno například 'mr720!', motor provede dvě otočky kolem své osy.
 
-Debug příkazy:
+### Debug příkazy:
 
 dl! - zapnutí nebo vypnutí zapojené diody
+
 dr! - reset hodnot - 'soft reset', jsou vymazány všechny prac. hodnoty
+
 ds! - vyzkouší fungování krokového motoru tím, že s ním provede jednu otočku
 
-Home příkazy:
+### Home příkazy:
 
 hs! - nastavení domovské pozice motoru
+
 hh! - návrat do domovské pozice motoru
+
 hr! - smazání domovské pozice motoru
 
 Arduino také vrací některé příkazy:
 
 step! - Signalizace kroku detekovaného optozávorou
+
 disc! - Signalizace žádosti o odpojení.
+
 gm! a gp! - Signalizace příkazu kroku pro krokový motor. Slouží pro identifikaci směru kroku získaného z příkazu 'step!'
 
 ## Android
