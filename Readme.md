@@ -47,6 +47,4 @@ gm! a gp! - Signalizace příkazu kroku pro krokový motor. Slouží pro identif
 
 Cílem Android aplikace je celou tuto protokolovou komunikaci obalit uživatelsky přívětivým grafickým rozhraním.
 
-Stav: Jsou již plně implementovány Motor, Home příkazy a ovládání motoru pomocí gyroskopu (využit Rotation Vector).
-
-Aktuálně se pracuje na 'step!' signalizaci, která zajistí zobrazení realtime stavu motoru.
+Stav: Plně implementovány příkazy, gyroskopické ovládání motoru a realtime stav otáčení motoru
