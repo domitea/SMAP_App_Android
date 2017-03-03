@@ -40,14 +40,14 @@
         android:onClick="onCheckClick" />
 
     <CheckBox
-        android:text="Zaporne"
+        android:id="@+id/negative_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/negative_check"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/btn_send"
         android:checked="false"
         android:onClick="onCheckClick"
-        android:layout_alignTop="@+id/btn_send"
-        android:layout_alignParentEnd="true" />
+        android:text="Záporné" />
 
     <TextView
         android:text="Nastavený úhel..."
@@ -115,5 +115,47 @@
         android:layout_alignStart="@+id/absolute_check"
         android:textOff="Gyro off"
         android:textOn="Gyro on" />
+
+    <ProgressBar
+        android:id="@+id/progressPlanned"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/gyroToggle"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textViewSeek"
+        android:layout_marginTop="59dp"
+        android:max="200"
+        android:progress="1" />
+
+    <ProgressBar
+        android:id="@+id/progressReal"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/progressPlanned"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/progressPlanned"
+        android:layout_marginTop="39dp"
+        android:max="200"
+        android:progress="1" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textViewSeek"
+        android:layout_marginTop="23dp"
+        android:text="Postup naplánovaných kroků (200 kroků na otočku)" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/progressPlanned"
+        android:layout_marginTop="11dp"
+        android:text="Aktuální stav kroků" />
 
 </RelativeLayout>

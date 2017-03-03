@@ -208,7 +208,7 @@ public class ControlActivity extends AppCompatActivity {
                 minus = 1;
             }
 
-            textSeek.setText("Nastaveno: " + settedValueFromProgress + " stupnu");
+            textSeek.setText("Nastaveno: " + settedValueFromProgress + " stupňů");
         }
         if (view.getId() == R.id.absolute_check) {
             if (checked) {
