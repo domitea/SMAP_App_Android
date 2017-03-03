@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -32,6 +33,10 @@ public class ControlActivity extends AppCompatActivity {
     SeekBar seekBar;
     ToggleButton gyroToggleButton;
 
+    ProgressBar progressBarOrderedSteps;
+    ProgressBar progressBarRealSteps;
+
+    final int STEPS_PER_REV = 200;
 
     int aimedSteps;
     boolean countPlus;
@@ -52,12 +57,12 @@ public class ControlActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control);
 
-        text = (TextView) findViewById(R.id.textView);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         textSeek = (TextView) findViewById(R.id.textViewSeek);
         gyroToggleButton = (ToggleButton) findViewById(R.id.gyroToggle);
 
-        text.setText(BTService.getSelectedDevice());
+        progressBarOrderedSteps = (ProgressBar) findViewById(R.id.progressPlanned);
+        progressBarRealSteps = (ProgressBar) findViewById(R.id.progressReal);
 
         sensorManager = (SensorManager) getBaseContext().getSystemService(Context.SENSOR_SERVICE);
 
@@ -68,9 +73,6 @@ public class ControlActivity extends AppCompatActivity {
         }
 
         sensorManager.registerListener(sensorEventListener, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
-
-
-        //BTService.send(new byte[] { (byte) 'D', (byte) 'R', (byte) '!'});
 
     }
 
@@ -166,14 +168,14 @@ public class ControlActivity extends AppCompatActivity {
             if (command.equals("GP")) {
                 aimedSteps++;
                 countPlus = true;
-                Log.d("SMAP", "parseMessage: " + aimedSteps);
-                text.setText("desired> " + aimedSteps + " steps");
+                //Log.d("SMAP", "parseMessage: " + aimedSteps);
+                progressBarOrderedSteps.setProgress(Math.abs(aimedSteps) % STEPS_PER_REV);
             }
             if (command.equals("GM")) {
                 aimedSteps--;
                 countPlus = false;
-                Log.d("SMAP", "parseMessage: " + aimedSteps);
-                text.setText("desired> " + aimedSteps + " steps");
+                //Log.d("SMAP", "parseMessage: " + aimedSteps);
+                progressBarOrderedSteps.setProgress(Math.abs(aimedSteps) % STEPS_PER_REV);
             }
             if (command.equals("STEP")) {
                 if (countPlus) {
@@ -181,6 +183,9 @@ public class ControlActivity extends AppCompatActivity {
                 } else {
                     realSteps--;
                 }
+
+                progressBarRealSteps.setProgress(Math.abs(realSteps) % STEPS_PER_REV);
+
                 Log.d("SMAP", "parseMessage real: " + realSteps);
             }
         }
@@ -190,8 +195,14 @@ public class ControlActivity extends AppCompatActivity {
         //BTService.send(new byte[] {(byte) 'm', (byte) 'r', (byte) '1', (byte) '8', (byte) '0', (byte) '!'});
         if (!absolute_checked) {
                 BTService.send(getCommand(CommandType.MOTOR_RELATIVE, settedValueFromProgress));
+                progressBarOrderedSteps.setProgress(0);
+                progressBarRealSteps.setProgress(0);
+                realSteps = 0;
             } else{
                 BTService.send(getCommand(CommandType.MOTOR_ABSOLUTE, settedValueFromProgress));
+                progressBarOrderedSteps.setProgress(0);
+                progressBarRealSteps.setProgress(0);
+                realSteps = 0;
             }
 
 

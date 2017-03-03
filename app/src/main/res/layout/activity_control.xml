@@ -10,14 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="uhk.fim.smap.matoulek.smap_app_android.ControlActivity">
 
-    <TextView
-        android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/textView" />
-
     <SeekBar
         style="@android:style/Widget.Material.Light.SeekBar"
         android:layout_width="wrap_content"
